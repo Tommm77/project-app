@@ -12,9 +12,5 @@ const convSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     }],
-    messages: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Message'
-    }],
     name: { type: String, required: true },
 });
