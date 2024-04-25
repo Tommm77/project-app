@@ -21,10 +21,10 @@ exports.getMessageById = async (req, res) => {
 }
 
 exports.createMessage = async (req, res) => {
-    const { content, sender, receiver } = req.body;
+    const { content, sender } = req.body;
 
     try {
-        const newMessage = await messageModel.create({ content, sender, receiver });
+        const newMessage = await messageModel.create({ content, sender });
         res.status(201).json(newMessage);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,10 +33,10 @@ exports.createMessage = async (req, res) => {
 
 exports.updateMessage = async (req, res) => {
     const { id } = req.params;
-    const { content, sender, receiver } = req.body;
+    const { content, sender } = req.body;
 
     try {
-        const updatedMessage = await messageModel.findByIdAndUpdate(id, { content, sender, receiver }, { new: true });
+        const updatedMessage = await messageModel.findByIdAndUpdate(id, { content, sender }, { new: true });
         res.status(200).json(updatedMessage);
     }
     catch (error) {
