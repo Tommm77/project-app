@@ -15,3 +15,6 @@ const messageSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     isRead: { type: Boolean, default: false }
 });
+
+const Message = mongoose.model('Message', messageSchema);
+export default Message;
