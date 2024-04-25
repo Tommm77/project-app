@@ -19,6 +19,7 @@ app.use(cors({
 
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
+require('./src/routes/route')(app)
 
 
 app.get('/', (req, res) => {
