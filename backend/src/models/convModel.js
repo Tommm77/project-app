@@ -16,4 +16,4 @@ const convSchema = new mongoose.Schema({
 });
 
 const Conv = mongoose.model('Conv', convSchema);
-export default Conv;
+module.exports = Conv;
