@@ -7,5 +7,6 @@ module.exports = (app) => {
     expressRouter.post('/conv', convController.createConv)
     expressRouter.patch('/conv/:id', convController.updateConv)
     expressRouter.delete('/conv/:id', convController.deleteConv)
+    expressRouter.get('/conv/user/:userId', convController.getConvByUser)
     app.use('/api/v1', expressRouter)
 }

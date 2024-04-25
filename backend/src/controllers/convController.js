@@ -25,6 +25,18 @@ exports.getConvById = async (req, res) => {
     }
 };
 
+exports.getConvByUser = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const convs = await convModel.find({ $or: [{ members: userId }, { admins: userId }] }).populate('admins members');
+        res.status(200).json(convs);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
+}
+
 exports.createConv = async (req, res) => {
     const { name, members, admins } = req.body;
 
