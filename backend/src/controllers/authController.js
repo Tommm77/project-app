@@ -21,6 +21,7 @@ exports.signUp = async (req, res) => {
         });
 
         // Gestion de la réponse
+        console.log('user :', user)
         return !user
             ? res.status(400).json({ statusCode: 400, message: 'ERROR IN CREATE NEW USER' })
             : res.status(200).json({ statusCode: 201, message: user });
@@ -37,7 +38,7 @@ exports.login = async (req, res) => {
     try {
         // Recherche de l'utilisateur par son nom d'utilisateur
         const user = await userModel.findOne({ username });
-
+       
         if (!user) {
             // Si aucun utilisateur n'est trouvé
             return res.status(404).json({ statusCode: 404, message: 'User not found' });
@@ -51,6 +52,7 @@ exports.login = async (req, res) => {
             return res.status(401).json({ statusCode: 401, message: 'Incorrect password' });
         }
 
+        console.log('user :', user)
         // L'utilisateur est authentifié, renvoyer les données de l'utilisateur
         return res.status(200).json({
             statusCode: 200,
@@ -58,7 +60,6 @@ exports.login = async (req, res) => {
                 user: user
             }
         });
-
     } catch (e) {
         console.log(e);
         return res.status(500).json({ statusCode: 500, message: e.message });

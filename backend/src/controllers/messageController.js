@@ -33,10 +33,10 @@ exports.createMessage = async (req, res) => {
 
 exports.updateMessage = async (req, res) => {
     const { id } = req.params;
-    const { content, sender, receiver } = req.body;
+    const { content, sender, isRead, receiver } = req.body;
 
     try {
-        const updatedMessage = await messageModel.findByIdAndUpdate(id, { content, sender, receiver }, { new: true });
+        const updatedMessage = await messageModel.findByIdAndUpdate(id, { content, sender, isRead, receiver }, { new: true });
         res.status(200).json(updatedMessage);
     }
     catch (error) {

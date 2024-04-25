@@ -12,5 +12,6 @@ const messageSchema = new mongoose.Schema({
         required: true
     },
     content: { type: String, required: true },
-    date: { type: Date, default: Date.now }
+    date: { type: Date, default: Date.now },
+    isRead: { type: Boolean, default: false }
 });

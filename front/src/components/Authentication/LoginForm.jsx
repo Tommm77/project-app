@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-
+import { useNavigate, Link } from 'react-router-dom';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  // const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigate = useNavigate();
   const handleChangeUsername = (e) => {
     setUsername(e.target.value);
   };
-  const handleChangeEmail = (e) => {
-    setEmail(e.target.value);
-  };
+  // const handleChangeEmail = (e) => {
+  //   setEmail(e.target.value);
+  // };
   const handleChangePassword = (e) => {
     setPassword(e.target.value);
   };
@@ -28,13 +28,13 @@ const LoginForm = () => {
           },
           body: JSON.stringify({
 
-            email,
+            username,
             password,
 
           })
         })
 
-
+        navigate('/');
     } catch (e) {
       console.error(e.message)
     } finally {
@@ -42,10 +42,12 @@ const LoginForm = () => {
       setTimeout(() => {
         setError("")
       }, 2000)
+    
     }
   };
 
   return (
+    <div>
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 flex flex-col space-y-4">
       <div className="flex flex-col">
         <label className="block text-gray-700 text-sm font-bold mb-2">Nom d'utilisateur :</label>
@@ -58,7 +60,7 @@ const LoginForm = () => {
           required
         />
       </div>
-      <div className="flex flex-col">
+      {/* <div className="flex flex-col">
         <label className="block text-gray-700 text-sm font-bold mb-2">Email :</label>
         <input
           type="email"
@@ -68,7 +70,7 @@ const LoginForm = () => {
           placeholder="Email"
           required
         />
-      </div>
+      </div> */}
       <div className="flex flex-col">
         <label className="block text-gray-700 text-sm font-bold mb-2">Mot de passe :</label>
         <input
@@ -85,7 +87,10 @@ const LoginForm = () => {
         Se connecter
       </button>
     </form>
+    <br></br>
+    <Link to="/create-account">Créer un compte?</Link>
 
+</div>
   );
 };
 
