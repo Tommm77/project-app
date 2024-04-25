@@ -17,4 +17,5 @@ const convSchema = new mongoose.Schema({
         ref: 'Message',
         required: true
     }],
+    name: { type: String, required: true },
 });
