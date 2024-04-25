@@ -3,6 +3,7 @@ const expressRouter = require('express').Router(),
 const {checkIsAuth} = require("../../config/passport");
 
 module.exports = (app) => {
+    app.get('/conv/user/:userId', convController.getConvByUser)
     expressRouter.get('/convs',checkIsAuth, convController.getAllConvs)
     expressRouter.get('/conv/:id',checkIsAuth, convController.getConvById)
     expressRouter.post('/conv',checkIsAuth, convController.createConv)

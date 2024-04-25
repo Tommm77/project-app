@@ -1,5 +1,5 @@
 const convModel = require('../models/convModel');
-
+const messageModel =  require('../models/messageModel');
 exports.getAllConvs = async (req, res) => {
     try {
         // Populate également les utilisateurs et messages pour une vue complète
@@ -24,18 +24,38 @@ exports.getConvById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 exports.getConvByUser = async (req, res) => {
     const { userId } = req.params;
 
     try {
+        // Trouver les conversations où l'utilisateur est membre ou admin
         const convs = await convModel.find({ $or: [{ members: userId }, { admins: userId }] }).populate('admins members');
-        res.status(200).json(convs);
+
+        // Pour chaque conversation, trouver les messages liés
+        const convsWithMessages = await Promise.all(convs.map(async (conv) => {
+            const messages = await messageModel.find({ receiver: conv._id }).populate('sender');
+            return {
+                ...conv.toObject(),
+                messages: messages
+            };
+        }));
+
+        res.status(200).json(convsWithMessages);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-
 }
+// exports.getConvByUser = async (req, res) => {
+//     const { userId } = req.params;
+
+//     try {
+//         const convs = await convModel.find({ $or: [{ members: userId }, { admins: userId }] }).populate('admins members');
+//         res.status(200).json(convs);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+
+// }
 
 exports.createConv = async (req, res) => {
     const { name, members, admins } = req.body;
