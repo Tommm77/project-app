@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const passport = require('passport'),
     userModel = require('../models/userModel');
+const {generateToken} = require("../utils/bcrypt");
 
 
 exports.signUp = async (req, res) => {
@@ -32,36 +33,24 @@ exports.signUp = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        // Recherche de l'utilisateur par son nom d'utilisateur
-        const user = await userModel.findOne({ username });
-       
-        if (!user) {
-            // Si aucun utilisateur n'est trouvé
-            return res.status(404).json({ statusCode: 404, message: 'User not found' });
-        }
-
-        // Vérification du mot de passe
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            // Si le mot de passe ne correspond pas
-            return res.status(401).json({ statusCode: 401, message: 'Incorrect password' });
-        }
-
-        console.log('user :', user)
-        // L'utilisateur est authentifié, renvoyer les données de l'utilisateur
+exports.login = async (req, res, next) => {
+    console.log('login')
+    passport.authenticate('local', {session: false}, async (err, user, info) => {
+        console.log("err", err)
+        console.log("info", info)
+        console.log("user", user)
+        if (err) return res.status(400).json({statusCode: 400, message: err.message})
+        if (!user) return res.status(422).json({statusCode: 422, message: info})
         return res.status(200).json({
             statusCode: 200,
             message: {
-                user: user
-            }
-        });
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json({ statusCode: 500, message: e.message });
-    }
-};
+                user: await user,
+                token: `Bearer ${
+                    generateToken({
+                        _id: user.id,
+                        username: user.username,
+                    })
+                }`}
+        })
+    })(req, res, next)
+}

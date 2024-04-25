@@ -23,6 +23,8 @@ app.use(express.json())
 
 require('./src/routes/route')(app)
 
+passport.use(passportConfig.localStrategy);
+passport.use(passportConfig.jwtStrategy);
 
 app.get('/', (req, res) => {
     return res.status(200).send('HELLO WORLD')
