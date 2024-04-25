@@ -30,15 +30,12 @@ exports.getUserById = async (req, res) => {
 
 exports.createUser = async (req, res) => {
     try {
-        const { userId, username, email, firstname, lastname, password } = req.body;
+        const { username, email, password } = req.body;
         ;
         const user = await userModel.create({
-            userId,
             username,
             email,
             password,
-            firstname,
-            lastname
         });
 
         return !user
@@ -55,10 +52,10 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { userId, username, email, firstname, lastname, password } = req.body;
+    const { username, email, firstname, lastname, password, avatarUrl } = req.body;
 
     try {
-        const updatedUser = await userModel.findByIdAndUpdate(id, { userId, username, email, firstname, lastname, password }, { new: true });
+        const updatedUser = await userModel.findByIdAndUpdate(id, { username, email, firstname, lastname, password, avatarUrl }, { new: true });
         res.status(200).json(updatedUser);
     } catch (error) {
         res.status(500).json({ message: error.message });
