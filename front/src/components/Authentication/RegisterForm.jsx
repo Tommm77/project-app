@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-
+import { useNavigate, Link } from 'react-router-dom';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
@@ -54,6 +54,7 @@ const RegisterForm = () => {
   };
 
   return (
+    <div>
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 flex flex-col space-y-4">
     <div className="flex flex-col">
         <label className="block text-gray-700 text-sm font-bold mb-2">Nom d'utilisateur :</label>
@@ -114,7 +115,9 @@ const RegisterForm = () => {
         Créer
     </button>
 </form>
-
+<br/>
+<Link to="/login">Vous avez un compte?</Link>
+</div>
   );
 };
 
