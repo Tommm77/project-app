@@ -100,7 +100,7 @@ const ChatComponent = ({ chats }) => {
         console.error('Error sending message:', error);
         // Gérer les erreurs, par exemple afficher une notification à l'utilisateur
     }
-};
+    };
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
@@ -148,8 +148,10 @@ const ChatComponent = ({ chats }) => {
             <div className="flex-1 flex flex-col bg-gray-100">
                 <div className="flex  bg-gray-200 p-4">
                     <h2 className="text-xl font-bold mr-20">{selectedChat ? chats.find(chat => chat._id === selectedChat).name : "Sélectionnez un chat"}</h2>
-                    <button className='font-bold hover:bg-gray-300 p-1 rounded-xl' onClick={openModal}>administrer groupe</button>
-                    <AdminConv isOpen={isModalOpen} onClose={closeModal}></AdminConv>
+                    {selectedChat ? (
+                        <button hide={selectedChat} className='font-bold hover:bg-gray-300 p-1 rounded-xl' onClick={openModal}>administrer groupe</button>
+                    ) : null}
+                    <AdminConv isOpen={isModalOpen} onClose={closeModal} ConvInfo={chats.find(chat => chat._id === selectedChat)}></AdminConv>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4">
                     {selectedChat && messages.map((message, index) => (
