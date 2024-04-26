@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 import io from "socket.io-client";
 import { useNavigate, Link } from 'react-router-dom';
+import AdminConv from '../AdminConv/AdminConv';
+
 const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMessageId, setEditingMessageId] = useState(null);
 
     useEffect(() => {
@@ -42,7 +45,7 @@ const ChatComponent = ({ chats }) => {
         return () => socket.disconnect();
     }, [selectedChat]);
 
-    console.log(messages)
+    //console.log(messages)
 
     useEffect(() => {
         if (selectedChat) {
@@ -63,6 +66,14 @@ const ChatComponent = ({ chats }) => {
         localStorage.removeItem('userId');
         // Redirigez vers la page de connexion ou la page d'accueil
         window.location.href = '/login'; // Remplacez par le chemin de votre page de connexion
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
     };
 
     const handleSubmit = async (e) => {
@@ -172,7 +183,11 @@ const ChatComponent = ({ chats }) => {
 
             {/* Zone de messages */}
             <div className="flex-1 flex flex-col bg-gray-100">
-                <h2 className="text-xl font-bold bg-gray-200 p-4">{selectedChat ? chats.find(chat => chat._id === selectedChat).name : "Sélectionnez un chat"}</h2>
+                <div className="flex  bg-gray-200 p-4">
+                    <h2 className="text-xl font-bold mr-20">{selectedChat ? chats.find(chat => chat._id === selectedChat).name : "Sélectionnez un chat"}</h2>
+                    <button className='font-bold hover:bg-gray-300 p-1 rounded-xl' onClick={openModal}>administrer groupe</button>
+                    <AdminConv isOpen={isModalOpen} onClose={closeModal}></AdminConv>
+                </div>
                 <div className="flex-1 overflow-y-auto p-4">
                     {selectedChat && messages.map((message, index) => (
                         <div
