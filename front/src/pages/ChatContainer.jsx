@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import MessagerieComponent from "../components/Home/MessagerieComponent";
+import ChatComponent from "../components/Chat/ChatComponent";
 
-const Messagerie = () => {
+const ChatContainer = () => {
     const [chats, setChats] = useState([]);
     const [users, setUsers] = useState([]);
     const [error, setError] = useState('');
@@ -68,8 +68,8 @@ const Messagerie = () => {
     }, []);
 
     return (
-        <MessagerieComponent chats={chats} users={users} error={error} />
+        <ChatComponent chats={chats} users={users} error={error} />
     );
 };
 
-export default Messagerie;
+export default ChatContainer;
