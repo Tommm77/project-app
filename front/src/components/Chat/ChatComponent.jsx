@@ -80,10 +80,16 @@ const ChatComponent = ({ chats }) => {
               content : messageText
             })
           });
-        } catch (e) {
-          console.error(e.message);
+        if (req.ok) {
+            setMessageText('');
+        } else {
+            throw new Error('Failed to send message');
         }
-      };
+    } catch (error) {
+        console.error('Error sending message:', error);
+        // Gérer les erreurs, par exemple afficher une notification à l'utilisateur
+    }
+};
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
@@ -91,28 +97,27 @@ const ChatComponent = ({ chats }) => {
             <div className="w-full md:w-1/4 bg-gray-800 text-white overflow-y-auto">
                 <div className="flex justify-between items-center p-4">
                     <h1 className="text-xl font-bold">Chats</h1>
-                    <FaSignOutAlt 
-                        className="cursor-pointer text-white text-xl" 
+                    <FaSignOutAlt
+                        className="cursor-pointer text-white text-xl"
                         onClick={handleLogout}
                     />
                 </div>
                 <ul>
                     {chats.map((chat) => (
-                        <li 
-                            key={chat._id} 
+                        <li
+                            key={chat._id}
                             className={`p-4 cursor-pointer hover:bg-gray-700 ${selectedChat === chat._id ? 'bg-gray-700' : ''}`}
                             onClick={() => handleChatClick(chat._id)}
                         >
                             <div className="flex items-center">
-                                {/* Avatar */}
-                                <img 
-                                    src={chat.avatar || 'https://via.placeholder.com/40'} 
-                                    alt="Avatar" 
+                                <img
+                                    src={chat.avatar || 'https://via.placeholder.com/40'}
+                                    alt="Avatar"
                                     className="w-8 h-8 rounded-full mr-4"
                                 />
                                 <div className="flex-1">
                                     <h3 className="text-base font-semibold">{chat.name}</h3>
-                                    <p className={`text-xs ${chat.messages.length > 0 && chat.messages[chat.messages.length - 1].isRead ? 'font-bold' : ''} text-gray-400 truncate`}>
+                                    <p className={`text-xs text-gray-400 truncate`}>
                                         {chat.messages.length > 0 ? chat.messages[chat.messages.length - 1].content : 'Aucun message'}
                                     </p>
                                     <p className="text-xs text-gray-500 mt-1">
@@ -126,46 +131,40 @@ const ChatComponent = ({ chats }) => {
             </div>
 
             {/* Zone de messages */}
-            <div className="flex-1 bg-gray-100">
-                {selectedChat ? (
-                    <>
-                        <h2 className="text-xl font-bold bg-gray-200 p-4">{chats.find(chat => chat._id === selectedChat).name}</h2>
-                        <div className="flex-1 p-4 overflow-y-auto">
-                            {messages.map((message, index) => (
-                                <div 
-                                    key={index} 
-                                    className={`message ${message.sender._id === selectedChat ? 'self' : 'other'}`}
-                                >
-                                    <span className="message-sender text-xs text-blue-500">{message.sender.username}</span>
-                                    <span className="message-content text-lg">{message.content}</span>
-                                </div>
-                            ))}
+            <div className="flex-1 flex flex-col bg-gray-100">
+                <h2 className="text-xl font-bold bg-gray-200 p-4">{selectedChat ? chats.find(chat => chat._id === selectedChat).name : "Sélectionnez un chat"}</h2>
+                <div className="flex-1 overflow-y-auto p-4">
+                    {selectedChat && messages.map((message, index) => (
+                        <div
+                            key={index}
+                            className={`flex mb-4 ${message.sender._id === localStorage.getItem("userId") ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div className={`rounded px-4 py-2 ${message.sender._id === localStorage.getItem("userId") ? 'bg-gray-800 text-white' : 'bg-gray-300 text-black'}`}>
+                                <span className="block text-xs text-gray-600">{message.sender.username}</span>
+                                <span className="block text-lg">{message.content}</span>
+                            </div>
                         </div>
-                        {/* Champ de saisie pour le message */}
-
-                        <div className="p-4 bg-white">
-                        <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-96">
-                            <input
-                                type="text"
-                                value={messageText}
-                                onChange={(e) => setMessageText(e.target.value)}
-                                placeholder="Entrez votre message..."
-                                className="w-full border rounded py-2 px-3 focus:outline-none focus:ring focus:border-blue-500"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2 focus:outline-none focus:ring focus:border-blue-500"
-                            >
-                                Envoyer
-                            </button>
-                            </form>
-                        </div>
-                    </>
-                ) : (
-                    <div className="flex-1 flex items-center justify-center">
-                        <p className="text-gray-500">Sélectionnez un chat pour commencer à discuter</p>
-                    </div>
-                )}
+                    ))}
+                </div>
+                {/* Champ de saisie pour le message */}
+                <div
+                    className="p-4 bg-gray-100">  {/* Changé de bg-white à bg-gray-100 pour une transition douce avec le reste */}
+                    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto">
+                        <input
+                            type="text"
+                            value={messageText}
+                            onChange={(e) => setMessageText(e.target.value)}
+                            placeholder="Entrez votre message..."
+                            className="form-input w-full border-0 p-3 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition duration-150 ease-in-out"
+                        />
+                        <button
+                            type="submit"
+                            className="mt-4 w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+                        >
+                            Envoyer
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
