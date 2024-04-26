@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 
-const MessagerieComponent = ({ chats }) => {
+const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
 
@@ -100,7 +100,7 @@ const MessagerieComponent = ({ chats }) => {
     );
 };
 
-export default MessagerieComponent;
+export default ChatComponent;
 
 // Styles
 const styles = `
