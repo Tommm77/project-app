@@ -20,7 +20,7 @@ const ProfileComponent = () => {
                headers: {
                      Accept: 'application/json',
                      'Content-Type': 'application/json',
-                     'Authorization': `${token}`
+                     'Authorization': `Bearer ${token}`
                }
             });
 
@@ -60,7 +60,7 @@ const ProfileComponent = () => {
                headers: {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
-                  'Authorization': `${token}`
+                  'Authorization': `Bearer ${token}`
                },
                body: JSON.stringify({
                   username,
@@ -75,7 +75,7 @@ const ProfileComponent = () => {
                headers: {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
-                  'Authorization': `${token}`
+                  'Authorization': `Bearer ${token}`
                },
                body: JSON.stringify({
                   username,
