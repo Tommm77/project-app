@@ -4,10 +4,22 @@ const express = require("express"),
     mongoose = require("mongoose"),
     passport = require('passport'),
     passportConfig = require('./src/config/passport')
+const {Server} = require("socket.io");
+    socketIo = require('socket.io');
+    http = require('http');
 dotenv = require("dotenv");
 dotenv.config({path: path.resolve(__dirname, '.env')});
 
 const app = express()
+const server = http.createServer(app); // Créez un serveur HTTP avec Express
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173", // Spécifiez l'origine exacte de votre client
+        methods: ["GET", "POST"],
+        credentials: true // important si vous utilisez des sessions ou des cookies
+    }
+});
+global.io = io;
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`).then(() => console.log('MongoDB connected successfully.'))
         .catch(err => console.error('MongoDB connection error:', err));
@@ -32,6 +44,18 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
     return res.status(404).send('404 NOT FOUND')
 })
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
+
+const PORT = process.env.PORT || 3002;
+server.listen(PORT, function() {
+    console.log(`Server running on port ${PORT}`);
+});
 
 app.listen(3001, async (err) => {
     if (err){

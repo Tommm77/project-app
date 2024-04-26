@@ -25,6 +25,9 @@ exports.createMessage = async (req, res) => {
 
     try {
         const newMessage = await messageModel.create({ content, sender, receiver });
+
+        global.io.emit('messageCreated', newMessage);
+
         res.status(201).json(newMessage);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -37,6 +40,9 @@ exports.updateMessage = async (req, res) => {
 
     try {
         const updatedMessage = await messageModel.findByIdAndUpdate(id, { content, sender, isRead, receiver }, { new: true });
+
+        global.io.emit('messageUpdated', updatedMessage);
+
         res.status(200).json(updatedMessage);
     }
     catch (error) {
@@ -49,6 +55,9 @@ exports.deleteMessage = async (req, res) => {
 
     try {
         await messageModel.findByIdAndDelete(id);
+
+        global.io.emit('messageDeleted', { messageId: id });
+
         res.status(200).json({ message: 'Message deleted successfully' });
     }
 
