@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
 import io from "socket.io-client";
-
+import { useNavigate, Link } from 'react-router-dom';
 const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -97,8 +97,11 @@ const ChatComponent = ({ chats }) => {
             <div className="w-full md:w-1/4 bg-gray-800 text-white overflow-y-auto">
                 <div className="flex justify-between items-center p-4">
                     <h1 className="text-xl font-bold">Chats</h1>
+                    <button>
+                       <Link to="/Profile" className="text-blue-500 hover:underline">Profile</Link>
+                    </button>
                     <FaSignOutAlt
-                        className="cursor-pointer text-white text-xl"
+                        className="cursor-pointer text-white text-xl" 
                         onClick={handleLogout}
                     />
                 </div>
