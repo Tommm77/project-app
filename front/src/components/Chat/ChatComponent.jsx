@@ -68,56 +68,38 @@ const ChatComponent = ({ chats }) => {
         window.location.href = '/login'; // Remplacez par le chemin de votre page de connexion
     };
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token');
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+        const requestBody = {
+            sender: [localStorage.getItem("userId")],
+            receiver: [selectedChat],
+            content: messageText
         };
 
-        const body = JSON.stringify({
-            content: messageText
-        });
-
-        const url = editingMessageId
-            ? `http://localhost:3001/api/v1/message/${editingMessageId}` // URL for PATCH
-            : 'http://localhost:3001/api/v1/message'; // URL for POST
-
-        const method = editingMessageId ? 'PATCH' : 'POST';
-
+        console.log("Sending request with body:", requestBody);
+        const token = localStorage.getItem('token');
         try {
-            const response = await fetch(url, {
-                method: method,
-                headers: headers,
-                body: body
+            const req = await fetch('http://localhost:3001/api/v1/message', {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    sender : [localStorage.getItem("userId")],
+                    receiver : [selectedChat],
+                    content : messageText
+                })
             });
-
-            const data = await response.json();
-            if (response.ok) {
-                setMessages(messages.map(msg => msg._id === editingMessageId ? {...msg, content: messageText} : msg));
+            if (req.ok) {
                 setMessageText('');
-                setEditingMessageId(null); // Reset editing ID after successful update
             } else {
-                throw new Error(data.message || 'Failed to send message');
+                throw new Error('Failed to send message');
             }
         } catch (error) {
             console.error('Error sending message:', error);
         }
-    };
-    const handleEditMessage = (message) => {
-        // Set message content to input for editing
-        setMessageText(message.content);
-        // Store the id of the message being edited
-        setEditingMessageId(message._id);
     };
 
     const handleDeleteMessage = async (messageId) => {
@@ -138,6 +120,17 @@ const ChatComponent = ({ chats }) => {
             console.error('Error deleting message:', error);
         }
     };
+
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
@@ -199,7 +192,6 @@ const ChatComponent = ({ chats }) => {
                                 <span className="block text-lg">{message.content}</span>
                                 {message.sender._id === localStorage.getItem("userId") && (
                                     <div className="text-sm mt-2">
-                                        <button className="text-blue-500 mr-2" onClick={() => handleEditMessage(message)}>Edit</button>
                                         <button className="text-red-500" onClick={() => handleDeleteMessage(message._id)}>Delete</button>
                                     </div>
                                 )}
