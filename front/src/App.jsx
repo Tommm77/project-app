@@ -5,7 +5,7 @@ import './App.css';
 import RegisterContainer from './pages/RegisterContainer';
 import LoginContainer from './pages/LoginContainer';
 import ChatContainer from './pages/ChatContainer';
-
+import ProfileContainer from './pages/ProfileContainer';
 function App() {
 
   return (
@@ -15,7 +15,7 @@ function App() {
       <Route path="/" element={<ChatContainer />} />
       <Route path="/create-account" element={<RegisterContainer />} />
       <Route path="/login" element={<LoginContainer />} />
-
+      <Route path="/Profile" element={<ProfileContainer />} />
     </Routes>
   </Router>
   )
