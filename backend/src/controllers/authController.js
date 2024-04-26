@@ -45,7 +45,7 @@ exports.login = async (req, res, next) => {
             statusCode: 200,
             message: {
                 user: await user,
-                token: `Bearer ${
+                token: `${
                     generateToken({
                         _id: user.id,
                         username: user.username,

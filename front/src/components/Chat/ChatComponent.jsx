@@ -1,10 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa';
+import io from "socket.io-client";
 
 const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
+
+    useEffect(() => {
+        const socket = io('http://localhost:3002', {
+            auth: {
+                token: localStorage.getItem('token')  // Assurez-vous que le token est correctement stocké et récupéré
+            }
+        });
+
+        socket.on('connect', () => {
+            console.log('Connected to socket server');
+        });
+
+        socket.on('messageCreated', (newMessage) => {
+            console.log('New message created', newMessage);
+        });
+
+        socket.on('connect_error', (error) => {
+            console.log('Connection error:', error.message);  // Vérifier la sortie pour des détails sur l'échec de connexion
+        });
+
+        socket.on('disconnect', (reason) => {
+            console.log('Disconnected from socket server', reason);
+        });
+
+        return () => socket.disconnect();
+    }, []);
+
 
     useEffect(() => {
         if (selectedChat) {
@@ -29,16 +57,26 @@ const ChatComponent = ({ chats }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const requestBody = {
+            sender: [localStorage.getItem("userId")],  // Assurez-vous que c'est bien 'userId' et non 'id' pour être cohérent avec les autres parties du code
+            receiver: [selectedChat],
+            content: messageText
+        };
+
+        console.log("Sending request with body:", requestBody);
+        const token = localStorage.getItem('token');
         try {
           const req = await fetch('http://localhost:3001/api/v1/message', {
             method: "POST",
             headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json'
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-              sender : localStorage.getItem("id"),
-              receiver : ,
+              body: JSON.stringify({
+              sender : [localStorage.getItem("id")],
+              receiver : [selectedChat],
+              content : messageText
             })
           });
           const data = await req.json();
@@ -48,7 +86,6 @@ const ChatComponent = ({ chats }) => {
           if (data.message.user) {
             localStorage.setItem('userId', data.message.user._id);
           }
-          navigate('/');
         } catch (e) {
           console.error(e.message);
         }

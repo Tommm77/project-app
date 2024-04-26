@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ChatComponent from "../components/Chat/ChatComponent";
+import io from "socket.io-client";
 
 const ChatContainer = () => {
     const [chats, setChats] = useState([]);
@@ -10,6 +11,7 @@ const ChatContainer = () => {
         const userId = localStorage.getItem('userId');
         const token = localStorage.getItem('token');
 
+
         const fetchData = async () => {
             try {
                 // Fetch des conversations de l'utilisateur
@@ -18,7 +20,7 @@ const ChatContainer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        'Authorization': `${token}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
@@ -35,7 +37,7 @@ const ChatContainer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        'Authorization': `${token}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 

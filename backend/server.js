@@ -5,6 +5,7 @@ const express = require("express"),
     passport = require('passport'),
     passportConfig = require('./src/config/passport')
 const {Server} = require("socket.io");
+const {verify} = require("jsonwebtoken");
     socketIo = require('socket.io');
     http = require('http');
 dotenv = require("dotenv");
@@ -19,6 +20,27 @@ const io = new Server(server, {
         credentials: true // important si vous utilisez des sessions ou des cookies
     }
 });
+
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    console.log("Token received:", token); // Vérifiez si le token est correctement reçu
+    if (token) {
+        verify(token, process.env.SECRET_PASS, (err, decoded) => {
+            if (err) {
+                console.log("JWT verification error:", err.message);
+                return next(new Error('Authentication error'));
+            }
+            socket.decoded = decoded;
+            console.log("JWT decoded:", decoded);
+            next();
+        });
+    } else {
+        next(new Error('Authentication error'));
+    }
+});
+
+
+
 global.io = io;
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`).then(() => console.log('MongoDB connected successfully.'))
