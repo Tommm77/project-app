@@ -22,7 +22,6 @@ exports.getMessageById = async (req, res) => {
 
 exports.createMessage = async (req, res) => {
     const { content, sender, receiver } = req.body;
-
     try {
         const newMessage = await messageModel.create({ content, sender, receiver });
 

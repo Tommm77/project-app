@@ -6,11 +6,12 @@ const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
+    const [userDetails, setUserDetails] = useState({});
 
     useEffect(() => {
         const socket = io('http://localhost:3002', {
             auth: {
-                token: localStorage.getItem('token')  // Assurez-vous que le token est correctement stocké et récupéré
+                token: localStorage.getItem('token')
             }
         });
 
@@ -18,12 +19,27 @@ const ChatComponent = ({ chats }) => {
             console.log('Connected to socket server');
         });
 
-        socket.on('messageCreated', (newMessage) => {
+        socket.on('messageCreated', async (newMessage) => {
             console.log('New message created', newMessage);
-        });
-
-        socket.on('connect_error', (error) => {
-            console.log('Connection error:', error.message);  // Vérifier la sortie pour des détails sur l'échec de connexion
+            console.log(newMessage.sender)
+            if (newMessage.receiver === selectedChat) {
+                if (!userDetails[newMessage.sender]) {
+                    try {
+                        const res = await fetch(`http://localhost:3001/api/v1/user/${newMessage.sender}`, {
+                            method: 'GET',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                        });
+                        const data = await res.json();
+                        setUserDetails(prev => ({ ...prev, [newMessage.sender]: data.username }));
+                    } catch (error) {
+                        console.error("Failed to fetch user details:", error);
+                    }
+                }
+                setMessages(prevMessages => [...prevMessages, newMessage]);
+            }
         });
 
         socket.on('disconnect', (reason) => {
@@ -31,8 +47,9 @@ const ChatComponent = ({ chats }) => {
         });
 
         return () => socket.disconnect();
-    }, []);
+    }, [selectedChat, userDetails]);
 
+    console.log('user details :',userDetails);
 
     useEffect(() => {
         if (selectedChat) {
@@ -74,18 +91,11 @@ const ChatComponent = ({ chats }) => {
                 'Authorization': `Bearer ${token}`
             },
               body: JSON.stringify({
-              sender : [localStorage.getItem("id")],
+              sender : [localStorage.getItem("userId")],
               receiver : [selectedChat],
               content : messageText
             })
           });
-          const data = await req.json();
-          if (data.message.token) {
-            localStorage.setItem('token', data.message.token);
-          }
-          if (data.message.user) {
-            localStorage.setItem('userId', data.message.user._id);
-          }
         } catch (e) {
           console.error(e.message);
         }
@@ -142,7 +152,7 @@ const ChatComponent = ({ chats }) => {
                                     key={index} 
                                     className={`message ${message.sender._id === selectedChat ? 'self' : 'other'}`}
                                 >
-                                    <span className="message-sender text-xs text-blue-500">{message.sender.username}</span>
+                                    <span className="message-sender text-xs text-blue-500">{userDetails[message.sender.username]}</span>
                                     <span className="message-content text-lg">{message.content}</span>
                                 </div>
                             ))}
