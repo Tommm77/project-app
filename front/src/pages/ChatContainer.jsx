@@ -46,7 +46,7 @@ const ChatContainer = () => {
                 }
 
                 const data = await req2.json(); // Convertir la réponse en JSON
-                setUsers(data);
+                setUsers(data.message);
                 
             } catch (error) {
                 console.error(error.message);

@@ -4,13 +4,46 @@ import io from "socket.io-client";
 import { useNavigate, Link } from 'react-router-dom';
 import AdminConv from '../AdminConv/AdminConv';
 
-const ChatComponent = ({ chats }) => {
+const ChatComponent = ({ chats,users }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMessageId, setEditingMessageId] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(''); // État pour stocker l'utilisateur sélectionné
+    const [selectedUsername, setSelectedUsername] = useState('');
+    const handleSubmitCreateConv = async (e) => {
+        const token = localStorage.getItem('token');
 
+        e.preventDefault();
+         let userSelected=users.find(user => user._id === selectedUser);
+         console.log(userSelected)
+        try {
+            const req = await fetch('http://localhost:3001/api/v1/conv', {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    admins : [localStorage.getItem("userId")],
+                    members : [selectedUser],
+                    name : userSelected.username
+                })
+            });
+            if (req.ok) {
+                setMessageText('');
+            } else {
+                throw new Error('Failed to send message');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+
+        // Insérez ici la logique pour créer une nouvelle conversation avec l'utilisateur sélectionné
+        console.log("Conversation créée avec l'utilisateur:", selectedUser);
+    };
     useEffect(() => {
         const socket = io('http://localhost:3002', {
             auth: {
@@ -145,6 +178,25 @@ const ChatComponent = ({ chats }) => {
                         className="cursor-pointer text-white text-xl"
                         onClick={handleLogout}
                     />
+                </div>
+                <div>
+                <form onSubmit={handleSubmitCreateConv}>
+    <select
+        value={selectedUser}
+        onChange={(e) => setSelectedUser(e.target.value)}
+        className="mr-2"
+    >
+        <option value="">Sélectionner un utilisateur</option>
+        {users.map(user => (
+            <option key={user._id} value={user._id} >{user.username}</option>
+            
+        ))}
+    </select>
+    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Chatez
+    </button>
+</form>
+
                 </div>
                 <ul>
                     {chats.map((chat) => (
