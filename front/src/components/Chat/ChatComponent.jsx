@@ -180,23 +180,21 @@ const ChatComponent = ({ chats,users }) => {
                     />
                 </div>
                 <div>
-                <form onSubmit={handleSubmitCreateConv}>
+                <form onSubmit={handleSubmitCreateConv} className="flex items-center">
     <select
         value={selectedUser}
         onChange={(e) => setSelectedUser(e.target.value)}
-        className="mr-2"
+        className="mr-2 text-black"
     >
         <option value="">Sélectionner un utilisateur</option>
         {users.map(user => (
-            <option key={user._id} value={user._id} >{user.username}</option>
-            
+            <option key={user._id} value={user._id}>{user.username}</option>
         ))}
     </select>
     <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Chatez
     </button>
 </form>
-
                 </div>
                 <ul>
                     {chats.map((chat) => (
