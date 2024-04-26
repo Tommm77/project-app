@@ -6,7 +6,6 @@ const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
-    const [userDetails, setUserDetails] = useState({});
 
     useEffect(() => {
         const socket = io('http://localhost:3002', {
@@ -23,21 +22,6 @@ const ChatComponent = ({ chats }) => {
             console.log('New message created', newMessage);
             console.log(newMessage.sender)
             if (newMessage.receiver === selectedChat) {
-                if (!userDetails[newMessage.sender]) {
-                    try {
-                        const res = await fetch(`http://localhost:3001/api/v1/user/${newMessage.sender}`, {
-                            method: 'GET',
-                            headers: {
-                                Accept: 'application/json',
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                        });
-                        const data = await res.json();
-                        setUserDetails(prev => ({ ...prev, [newMessage.sender]: data.username }));
-                    } catch (error) {
-                        console.error("Failed to fetch user details:", error);
-                    }
-                }
                 setMessages(prevMessages => [...prevMessages, newMessage]);
             }
         });
@@ -47,9 +31,9 @@ const ChatComponent = ({ chats }) => {
         });
 
         return () => socket.disconnect();
-    }, [selectedChat, userDetails]);
+    }, [selectedChat]);
 
-    console.log('user details :',userDetails);
+    console.log(messages)
 
     useEffect(() => {
         if (selectedChat) {
@@ -152,7 +136,7 @@ const ChatComponent = ({ chats }) => {
                                     key={index} 
                                     className={`message ${message.sender._id === selectedChat ? 'self' : 'other'}`}
                                 >
-                                    <span className="message-sender text-xs text-blue-500">{userDetails[message.sender.username]}</span>
+                                    <span className="message-sender text-xs text-blue-500">{message.sender.username}</span>
                                     <span className="message-content text-lg">{message.content}</span>
                                 </div>
                             ))}

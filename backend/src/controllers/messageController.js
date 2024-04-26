@@ -1,4 +1,5 @@
 const messageModel = require('../models/messageModel');
+const userModel = require('../models/userModel');
 
 exports.getAllMessages = async (req, res) => {
     try {
@@ -21,17 +22,29 @@ exports.getMessageById = async (req, res) => {
 }
 
 exports.createMessage = async (req, res) => {
-    const { content, sender, receiver } = req.body;
-    try {
-        const newMessage = await messageModel.create({ content, sender, receiver });
+    let { content, sender, receiver } = req.body;
 
-        global.io.emit('messageCreated', newMessage);
+    try {
+        const user = await userModel.findById(sender[0]).exec();
+
+        if (!user) {
+            return res.status(404).json({ message: "Receiver not found." });
+        }
+
+        const newMessage = await messageModel.create({ content, receiver, sender });
+
+        global.io.emit('messageCreated', {
+            content: newMessage.content,
+            sender: user,
+            receiver: newMessage.receiver,
+        });
 
         res.status(201).json(newMessage);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
 
 exports.updateMessage = async (req, res) => {
     const { id } = req.params;
