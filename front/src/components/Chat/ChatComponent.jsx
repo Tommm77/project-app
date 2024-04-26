@@ -4,6 +4,7 @@ import { FaSignOutAlt } from 'react-icons/fa';
 const ChatComponent = ({ chats }) => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [messageText, setMessageText] = useState('');
 
     useEffect(() => {
         if (selectedChat) {
@@ -26,12 +27,32 @@ const ChatComponent = ({ chats }) => {
         window.location.href = '/login'; // Remplacez par le chemin de votre page de connexion
     };
 
-    // Fonction pour générer une couleur à partir de l'ID de l'utilisateur
-    const generateColorFromUserId = (userId) => {
-        const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A8', '#33FFE0', '#FFD700'];
-        const index = userId % colors.length;
-        return colors[index];
-    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const req = await fetch('http://localhost:3001/api/v1/message', {
+            method: "POST",
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              sender : localStorage.getItem("id"),
+              receiver : ,
+            })
+          });
+          const data = await req.json();
+          if (data.message.token) {
+            localStorage.setItem('token', data.message.token);
+          }
+          if (data.message.user) {
+            localStorage.setItem('userId', data.message.user._id);
+          }
+          navigate('/');
+        } catch (e) {
+          console.error(e.message);
+        }
+      };
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
@@ -88,6 +109,25 @@ const ChatComponent = ({ chats }) => {
                                     <span className="message-content text-lg">{message.content}</span>
                                 </div>
                             ))}
+                        </div>
+                        {/* Champ de saisie pour le message */}
+
+                        <div className="p-4 bg-white">
+                        <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-96">
+                            <input
+                                type="text"
+                                value={messageText}
+                                onChange={(e) => setMessageText(e.target.value)}
+                                placeholder="Entrez votre message..."
+                                className="w-full border rounded py-2 px-3 focus:outline-none focus:ring focus:border-blue-500"
+                            />
+                            <button
+                                type="submit"
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2 focus:outline-none focus:ring focus:border-blue-500"
+                            >
+                                Envoyer
+                            </button>
+                            </form>
                         </div>
                     </>
                 ) : (
